@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +7,7 @@ import Icon from '@/components/ui/icon';
 const Index = () => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isSlideshow, setIsSlideshow] = useState(false);
 
   const photos = [
     {
@@ -30,6 +31,15 @@ const Index = () => {
   const prevPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
+
+  useEffect(() => {
+    if (isSlideshow) {
+      const interval = setInterval(() => {
+        setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isSlideshow, photos.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
@@ -136,13 +146,22 @@ const Index = () => {
                   <img
                     src={photos[currentPhotoIndex].url}
                     alt={photos[currentPhotoIndex].caption}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+                    key={currentPhotoIndex}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <p className="text-white text-2xl font-semibold drop-shadow-lg">
                       {photos[currentPhotoIndex].caption}
                     </p>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <Button
+                      onClick={() => setIsSlideshow(!isSlideshow)}
+                      className={`rounded-full ${isSlideshow ? 'bg-accent' : 'bg-white'} hover:scale-110 transition-all`}
+                    >
+                      <Icon name={isSlideshow ? "Pause" : "Play"} size={20} />
+                    </Button>
                   </div>
                 </div>
 
